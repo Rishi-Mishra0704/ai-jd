@@ -9,7 +9,7 @@ const Home =() => {
   const handleSubmit = async (e:any) => {
     e.preventDefault();
 
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.first+GEMINI_API_KEY.second+GEMINI_API_KEY.third);
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
