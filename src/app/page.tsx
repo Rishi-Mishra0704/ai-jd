@@ -1,95 +1,50 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+import { useState } from "react";
+import { GEMINI_API_KEY } from "@/constants";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+const Home =() => {
+  const [prompt , setPrompt] = useState<string>("")
+  const [jobDescription, setJobDescription] = useState<string>("");
 
-export default function Home() {
+  const handleSubmit = async (e:any) => {
+    e.preventDefault();
+
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+
+    try {
+      const result = await model.generateContent(prompt);
+      const response = result.response;
+      const text = response.text();
+      console.log(text);
+
+     
+    } catch (error) {
+      console.error("Error generating job description:", error);
+      setJobDescription("Error generating job description.");
+    }
+  };
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <form onSubmit={handleSubmit}>
+      <h1>Generate Job Description</h1>
+      <label htmlFor="prompt">Prompt:</label>
+      <textarea
+        id="prompt"
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+      />
+      <button type="submit">Generate</button>
+     {
+        jobDescription && (
+          <div>
+            <h2>Generated Job Description</h2>
+            <p>{jobDescription}</p>
+          </div>
+        )
+     }
+    </form>
   );
-}
+};
+
+export default Home;
