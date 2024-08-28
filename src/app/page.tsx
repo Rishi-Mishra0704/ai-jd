@@ -4,11 +4,11 @@ import { GEMINI_API_KEY } from "@/constants";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Container, Row, Col, Form, Button, Alert, Card } from 'react-bootstrap';
 
-
 const Home = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [jobDescription, setJobDescription] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [activities, setActivities] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,10 +18,10 @@ const Home = () => {
 
     try {
       const result = await model.generateContent(`Generate a job description for this ${prompt}, give it in html format.`);
-      const response = result.response;
-      const text = response.text();
-      setJobDescription(text);
+      const response = await result.response.text(); // Ensure we await the text extraction
+      setJobDescription(response);
       setError(null); // Clear any previous errors
+      setActivities([...activities, `${prompt.split(' ').slice(0, 3).join(' ')}...`]);
     } catch (error) {
       console.error("Error generating job description:", error);
       setError("Error generating job description.");
@@ -30,19 +30,30 @@ const Home = () => {
   };
 
   return (
-    <Container className="mt-4">
+    <Container fluid className="mt-4">
       <Row>
-        <Col md={6}>
-          <h1 className="text-center mb-4">Generate Job Description</h1>
+        {/* Recent Activities Section */}
+        <Col xl={2} className="px-2 border-end" style={{ borderRight: '1px solid #ccc' }}>
+          <h2 className="text-primary">Recent Activities</h2>
+          <ul className="list-unstyled mt-3">
+            {activities.map((activity, index) => (
+              <li key={index} className="mb-2">{activity}</li>
+            ))}
+          </ul>
+        </Col>
+
+        {/* Prompt Input Section */}
+        <Col xl={4} className="px-3">
+          <h2 className="text-center text-primary mb-4">Generate Job Description</h2>
           <Form onSubmit={handleSubmit}>
             <Form.Group controlId="prompt" className="mb-3">
-              <Form.Label>Prompt</Form.Label>
+              <Form.Label className="fw-bold">Prompt</Form.Label>
               <Form.Control
                 as="textarea"
-                rows={8}
+                rows={5}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Enter your Position and Tech stack"
+                placeholder="Enter the position and tech stack details"
               />
             </Form.Group>
             <Button variant="primary" type="submit" className="w-100">
@@ -55,16 +66,22 @@ const Home = () => {
             )}
           </Form>
         </Col>
-        <Col md={6}>
-          {jobDescription && (
+
+        {/* Generated Job Description Section */}
+        <Col xl={6} className="px-3">
+          {jobDescription ? (
             <Card className="mt-4">
               <Card.Body>
-                <Card.Title>Generated Job Description</Card.Title>
-                <Card.Text>
+                <Card.Title className="text-primary">Generated Job Description</Card.Title>
+                <Card.Text >
                   {jobDescription}
                 </Card.Text>
               </Card.Body>
             </Card>
+          ) : (
+            <Alert className="mt-4">
+              Generated job description will appear here.
+            </Alert>
           )}
         </Col>
       </Row>
