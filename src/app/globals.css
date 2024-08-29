@@ -6,8 +6,8 @@ body{
 
 .spinner-container {
   position: relative;
-  width: 3rem;
-  height: 3rem;
+  width: 20px;
+  height: 20px;
 }
 
 .spinner-icon {
