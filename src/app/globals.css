@@ -3,3 +3,19 @@ body{
   padding: 0;
   box-sizing: border-box;
 }
+
+.spinner-container {
+  position: relative;
+  width: 3rem;
+  height: 3rem;
+}
+
+.spinner-icon {
+  font-size: 3rem; /* Adjust size as needed */
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

@@ -10,10 +10,10 @@ import {
   Button,
   Alert,
   Card,
-  Spinner,
 } from "react-bootstrap";
 import { TbWaveSawTool, TbSend } from "react-icons/tb";
 import { FiLoader } from "react-icons/fi";
+import Spinner from "@/components/Spinner";
 
 const Home = () => {
   const [jobDescription, setJobDescription] = useState<string | null>(null);
@@ -142,9 +142,9 @@ const Home = () => {
                 </Form.Group>
                 <Button variant="primary" type="submit" className="w-100">
                   {loading ? (
-                    <Spinner animation="border" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </Spinner>
+                    <div className="d-flex justify-content-center align-items-center">
+                    <Spinner/>
+                    </div>
                   ) : (
                     <>
                       <TbWaveSawTool /> Generate
