@@ -12,13 +12,11 @@ import {
   Card,
 } from "react-bootstrap";
 import { TbWaveSawTool, TbSend } from "react-icons/tb";
-import { FiLoader } from "react-icons/fi";
 import Spinner from "@/components/Spinner";
 
 const Home = () => {
   const [jobDescription, setJobDescription] = useState<string | null>(null);
-  const [additionalRequirements, setAdditionalRequirements] =
-    useState<string>("");
+  const [additionalRequirements, setAdditionalRequirements] = useState<string>("");
   const [position, setPosition] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [experience, setExperience] = useState<string>("");
@@ -42,7 +40,7 @@ const Home = () => {
       const result = await model.generateContent(
         `Generate a job description for this ${position} , xp is ${experience}, see whatever you like. dont forget ${additionalRequirements} make it in docs format which I can send over in email`
       );
-      const response = result.response.text(); // Ensure we await the text extraction
+      const response = await result.response.text(); // Ensure we await the text extraction
       setJobDescription(response);
       setError(null); // Clear any previous errors
     } catch (error) {
@@ -77,30 +75,35 @@ const Home = () => {
   };
 
   return (
-    <Container
-      fluid
-      className="d-flex justify-content-center align-items-center vh-100"
-      style={{
-        ...(jobDescription
-          ? {}
-          : {
-              backgroundImage: `url('/jd-back.png')`,
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-              backgroundAttachment: "fixed",
-              backgroundRepeat: "no-repeat",
-            }),
-      }}
-    >
+    <Container fluid className="d-flex justify-content-center align-items-center vh-100 position-relative">
+      {/* Background Blur */}
+      {!jobDescription && (
+        <div
+          className="position-absolute top-0 start-0 w-100 h-100"
+          style={{
+            backgroundImage: `url('/jd-back.png')`,
+            backgroundSize: "contain",
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed",
+            backgroundRepeat: "no-repeat",
+            filter: "blur(2px)",
+            WebkitFilter: "blur(2px)",
+            zIndex: -1,
+          }}
+        />
+      )}
+      
+      {/* Content */}
       {!jobDescription ? (
         <Card
-          className="p-4 shadow-lg"
+          className="p-4 shadow-lg position-relative"
           style={{
+            width: "450px",
             backdropFilter: "blur(10px)",
             backgroundColor: "rgba(255, 255, 255, 0.7)",
+            zIndex: 1, // Ensure the Card is above the background
           }}
         >
-          {}
           <Row>
             <Col className="text-center">
               <h2 className="text-primary mb-4">JD Generator</h2>
@@ -143,7 +146,7 @@ const Home = () => {
                 <Button variant="primary" type="submit" className="w-100">
                   {loading ? (
                     <div className="d-flex justify-content-center align-items-center">
-                    <Spinner/>
+                      <Spinner />
                     </div>
                   ) : (
                     <>
