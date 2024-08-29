@@ -12,6 +12,7 @@ import {
   Card,
 } from "react-bootstrap";
 import { TbWaveSawTool, TbSend } from "react-icons/tb";
+import { FiLoader } from "react-icons/fi";
 
 const Home = () => {
   const [jobDescription, setJobDescription] = useState<string | null>(null);
@@ -21,16 +22,24 @@ const Home = () => {
   const [email, setEmail] = useState<string>("");
   const [experience, setExperience] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true);
     const genAI = new GoogleGenerativeAI(
       GEMINI_API_KEY.first + GEMINI_API_KEY.second + GEMINI_API_KEY.third
     );
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     try {
+      if (!position || !experience || !additionalRequirements) {
+        setError(
+          "Please provide a job title, years of experience and additional requirements"
+        );
+        setLoading(false);
+        return;
+      }
       const result = await model.generateContent(
         `Generate a job description for this ${position} , xp is ${experience}, see whatever you like. dont forget ${additionalRequirements} make it in html format which I can send over in email`
       );
@@ -41,6 +50,8 @@ const Home = () => {
       console.error("Error generating job description:", error);
       setError("Error generating job description.");
       setJobDescription(null); // Clear any previous job description
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,7 +137,13 @@ const Home = () => {
                   />
                 </Form.Group>
                 <Button variant="primary" type="submit" className="w-100">
-                  <TbWaveSawTool /> Generate
+                  {loading ? (
+                    <FiLoader className="animate-spin" />
+                  ) : (
+                    <>
+                      <TbWaveSawTool /> Generate
+                    </>
+                  )}
                 </Button>
                 {error && (
                   <Alert variant="danger" className="mt-3">
