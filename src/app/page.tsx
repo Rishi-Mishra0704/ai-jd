@@ -10,6 +10,7 @@ import {
   Button,
   Alert,
   Card,
+  Spinner,
 } from "react-bootstrap";
 import { TbWaveSawTool, TbSend } from "react-icons/tb";
 import { FiLoader } from "react-icons/fi";
@@ -33,15 +34,13 @@ const Home = () => {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     try {
-      if (!position || !experience || !additionalRequirements) {
-        setError(
-          "Please provide a job title, years of experience and additional requirements"
-        );
+      if (!position || !experience) {
+        setError("Please provide a job title and years of experience");
         setLoading(false);
         return;
       }
       const result = await model.generateContent(
-        `Generate a job description for this ${position} , xp is ${experience}, see whatever you like. dont forget ${additionalRequirements} make it in html format which I can send over in email`
+        `Generate a job description for this ${position} , xp is ${experience}, see whatever you like. dont forget ${additionalRequirements} make it in docs format which I can send over in email`
       );
       const response = result.response.text(); // Ensure we await the text extraction
       setJobDescription(response);
@@ -82,11 +81,15 @@ const Home = () => {
       fluid
       className="d-flex justify-content-center align-items-center vh-100"
       style={{
-        backgroundImage: `url('/jd-back.png')`,
-        backgroundSize: "contain",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
+        ...(jobDescription
+          ? {}
+          : {
+              backgroundImage: `url('/jd-back.png')`,
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundAttachment: "fixed",
+              backgroundRepeat: "no-repeat",
+            }),
       }}
     >
       {!jobDescription ? (
@@ -97,6 +100,7 @@ const Home = () => {
             backgroundColor: "rgba(255, 255, 255, 0.7)",
           }}
         >
+          {}
           <Row>
             <Col className="text-center">
               <h2 className="text-primary mb-4">JD Generator</h2>
@@ -138,7 +142,9 @@ const Home = () => {
                 </Form.Group>
                 <Button variant="primary" type="submit" className="w-100">
                   {loading ? (
-                    <FiLoader className="animate-spin" />
+                    <Spinner animation="border" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </Spinner>
                   ) : (
                     <>
                       <TbWaveSawTool /> Generate
@@ -155,37 +161,44 @@ const Home = () => {
           </Row>
         </Card>
       ) : (
-        <Row className="position-fixed bottom-0 start-50 translate-middle-x w-100 my-4">
-          <Col xs={12}>
-            <Card className="p-3 mx-auto" style={{ maxWidth: "500px" }}>
-              <h2 className="text-primary mb-4 text-center">JD Generator</h2>
-              <>
-                <Form
-                  onSubmit={handleSendEmail}
-                  className="d-flex align-items-center"
-                >
-                  <div className="d-flex flex-column flex-grow-1 me-2">
-                    <Form.Label className="fw-bold mb-1">Email</Form.Label>
-                    <Form.Control
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      type="email"
-                      placeholder="johnDoe@example.com"
-                    />
-                  </div>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    className="w-auto mt-4"
-                    style={{ minWidth: "100px" }} // Ensure the button has a minimum width
+        <>
+          <Container fluid className="d-flex flex-column align-items-center">
+            <Col sm={6} className="">
+              <div>{jobDescription}</div>
+            </Col>
+            <Row className="w-100 my-4">
+              <Col xs={12} className="d-flex justify-content-center">
+                <Card className="p-3 mx-auto" style={{ maxWidth: "500px" }}>
+                  <h2 className="text-primary mb-4 text-center">
+                    JD Generator
+                  </h2>
+                  <Form
+                    onSubmit={handleSendEmail}
+                    className="d-flex align-items-center"
                   >
-                    <TbSend /> Send
-                  </Button>
-                </Form>
-              </>
-            </Card>
-          </Col>
-        </Row>
+                    <div className="d-flex flex-column flex-grow-1 me-2">
+                      <Form.Label className="fw-bold mb-1">Email</Form.Label>
+                      <Form.Control
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        type="email"
+                        placeholder="johnDoe@example.com"
+                      />
+                    </div>
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      className="w-auto mt-2"
+                      style={{ minWidth: "100px" }} // Ensure the button has a minimum width
+                    >
+                      <TbSend /> Send
+                    </Button>
+                  </Form>
+                </Card>
+              </Col>
+            </Row>
+          </Container>
+        </>
       )}
     </Container>
   );
